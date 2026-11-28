@@ -1816,144 +1816,27 @@ function getVideoJobCardsHTML(filterStage) {
 }
 
 // ==========================================
-// 4. TO-DO QUEUE DRAWER CONTROLLER
+// 4. TO-DO QUEUE DRAWER DELEGATES
+// (Master implementation residing in js/app.js)
 // ==========================================
-function toggleTodoPanel() {
-  const drawer = document.getElementById('todoDrawer');
-  const backdrop = document.getElementById('todoBackdrop');
-  if (!drawer) return;
-
-  const isOpen = drawer.classList.contains('active') || drawer.classList.contains('open');
-  if (isOpen) {
-    closeTodoPanel();
-  } else {
-    drawer.classList.add('active');
-    drawer.classList.add('open');
-    if (backdrop) {
-      backdrop.classList.add('active');
-      backdrop.classList.add('open');
-    }
-    renderTodoList();
-  }
+// Backwards compatibility bindings
+if (typeof toggleTodoPanel === 'undefined' && typeof window.toggleTodoPanel === 'function') {
+  var toggleTodoPanel = window.toggleTodoPanel;
 }
-
-function closeTodoPanel() {
-  const drawer = document.getElementById('todoDrawer');
-  const backdrop = document.getElementById('todoBackdrop');
-  if (drawer) {
-    drawer.classList.remove('active');
-    drawer.classList.remove('open');
-  }
-  if (backdrop) {
-    backdrop.classList.remove('active');
-    backdrop.classList.remove('open');
-  }
+if (typeof closeTodoPanel === 'undefined' && typeof window.closeTodoPanel === 'function') {
+  var closeTodoPanel = window.closeTodoPanel;
 }
-
-// Ensure globally accessible on window
-window.toggleTodoPanel = toggleTodoPanel;
-window.closeTodoPanel = closeTodoPanel;
-
-function renderTodoList() {
-  const container = document.getElementById('todoListContainer');
-  if (!container) return;
-
-  let list = erpState.todoList || [];
-  const currentRole = erpState.currentUser ? erpState.currentUser.roleKey : 'workshop_manager';
-
-  if (currentTodoFilter === 'mine') {
-    list = list.filter(t => t.roleKey === currentRole);
-  } else if (currentTodoFilter === 'urgent') {
-    list = list.filter(t => t.priority === 'Urgent');
-  }
-
-  // Update counts
-  const allCount = (erpState.todoList || []).filter(t => !t.completed).length;
-  const countSpan = document.getElementById('todoCountAll');
-  if (countSpan) countSpan.textContent = allCount;
-  
-  const badge = document.getElementById('topbarTodoBadge');
-  if (badge) {
-    badge.textContent = allCount;
-    badge.style.display = allCount === 0 ? 'none' : 'flex';
-  }
-
-  if (list.length === 0) {
-    container.innerHTML = `
-      <div style="padding: 30px; text-align: center; color: #94a3b8; font-size: 13px;">
-        🎉 All operational tasks in this queue are completed!
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = list.map(item => {
-    const isDone = item.completed === true;
-    const prioColor = item.priority === 'Urgent' ? '#f87171' : (item.priority === 'High' ? '#fbbf24' : '#38bdf8');
-
-    return `
-      <div class="todo-item-card" style="opacity: ${isDone ? 0.6 : 1}; border-left: 3px solid ${prioColor};">
-        <div style="display: flex; gap: 10px; align-items: flex-start;">
-          <input type="checkbox" ${isDone ? 'checked' : ''} style="margin-top: 4px; cursor: pointer;" onchange="toggleTodoComplete('${item.id}')" />
-          <div style="flex: 1;" onclick="jumpToTodoStep('${item.jobRef}', '${item.step}')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #fff; text-decoration: ${isDone ? 'line-through' : 'none'}; cursor: pointer;">
-                ${item.title}
-              </h4>
-              <span style="font-size: 10px; font-weight: 800; color: ${prioColor}; background: rgba(255, 255, 255, 0.05); padding: 2px 6px; border-radius: 4px;">
-                ${item.priority}
-              </span>
-            </div>
-            <p style="margin: 3px 0 0; font-size: 11.5px; color: #94a3b8;">${item.subtitle}</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px; color: #64748b;">
-              <span>Target: <strong>${item.due}</strong></span>
-              <span style="color: #38bdf8; font-weight: 700; cursor: pointer;">Jump to Step ➔</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
+if (typeof renderTodoList === 'undefined' && typeof window.renderTodoList === 'function') {
+  var renderTodoList = window.renderTodoList;
 }
-
-function filterTodoList(filterType) {
-  currentTodoFilter = filterType;
-  document.querySelectorAll('.todo-filter-chip').forEach(c => c.classList.remove('active'));
-  
-  if (filterType === 'all') {
-    const chip = document.getElementById('chipTodoAll');
-    if (chip) chip.classList.add('active');
-  } else if (filterType === 'mine') {
-    const chip = document.getElementById('chipTodoMine');
-    if (chip) chip.classList.add('active');
-  } else if (filterType === 'urgent') {
-    const chip = document.getElementById('chipTodoUrgent');
-    if (chip) chip.classList.add('active');
-  }
-
-  renderTodoList();
+if (typeof filterTodoList === 'undefined' && typeof window.filterTodoList === 'function') {
+  var filterTodoList = window.filterTodoList;
 }
-
-function toggleTodoComplete(todoId) {
-  const item = (erpState.todoList || []).find(t => t.id === todoId);
-  if (item) {
-    item.completed = !item.completed;
-    saveERPData(erpState);
-    renderTodoList();
-    showToast(item.completed ? `Task marked complete!` : `Task marked active`, 'info');
-  }
+if (typeof toggleTodoComplete === 'undefined' && typeof window.toggleTodoComplete === 'function') {
+  var toggleTodoComplete = window.toggleTodoComplete;
 }
-
-function jumpToTodoStep(jobRef, stepKey) {
-  currentTab = 'operations';
-  selectedOpJobId = jobRef;
-  currentOpStep = stepKey;
-  closeTodoPanel();
-  
-  // Re-render sidebar to highlight Operations
-  renderSidebarForActiveRole();
-  renderCurrentTab();
-  showToast(`Jumped to Operations: ${stepKey} for Job #${jobRef}`, 'info');
+if (typeof jumpToTodoStep === 'undefined' && typeof window.jumpToTodoStep === 'function') {
+  var jumpToTodoStep = window.jumpToTodoStep;
 }
 
 // ==========================================

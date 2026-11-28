@@ -1323,20 +1323,14 @@ function setupEventListeners() {
       if (e.target === modal) closeModal();
     });
   }
-
-  const todoBtn = document.getElementById('topbarTodoBtn');
-  if (todoBtn) {
-    todoBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (typeof toggleTodoPanel === 'function') {
-        toggleTodoPanel();
-      }
-    });
-  }
 }
 
 function setupGlobalShortcuts() {
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeTodoPanel();
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
       e.preventDefault();
       const input = document.getElementById('globalSearchInput');
@@ -1354,6 +1348,169 @@ function setupGlobalShortcuts() {
     }
   });
 }
+
+// ==========================================
+// OPERATIONS TO-DO DRAWER CONTROLLER
+// ==========================================
+let _lastTodoToggleTime = 0;
+function toggleTodoPanel(e) {
+  if (e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+  }
+  const now = Date.now();
+  if (now - _lastTodoToggleTime < 250) {
+    return;
+  }
+  _lastTodoToggleTime = now;
+
+  const drawer = document.getElementById('todoDrawer');
+  const backdrop = document.getElementById('todoBackdrop');
+  if (!drawer) return;
+
+  const isOpen = drawer.classList.contains('active') || drawer.classList.contains('open');
+  if (isOpen) {
+    closeTodoPanel();
+  } else {
+    drawer.classList.add('active');
+    drawer.classList.add('open');
+    if (backdrop) {
+      backdrop.classList.add('active');
+      backdrop.classList.add('open');
+    }
+    renderTodoList();
+  }
+}
+
+function closeTodoPanel() {
+  const drawer = document.getElementById('todoDrawer');
+  const backdrop = document.getElementById('todoBackdrop');
+  if (drawer) {
+    drawer.classList.remove('active');
+    drawer.classList.remove('open');
+  }
+  if (backdrop) {
+    backdrop.classList.remove('active');
+    backdrop.classList.remove('open');
+  }
+}
+
+function renderTodoList() {
+  const container = document.getElementById('todoListContainer');
+  if (!container) return;
+
+  if (!erpState && typeof getERPData === 'function') {
+    erpState = getERPData();
+  }
+  let list = (erpState && erpState.todoList) ? erpState.todoList : (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.todoList : []);
+  const currentRole = (erpState && erpState.currentUser) ? erpState.currentUser.roleKey : 'workshop_manager';
+
+  if (currentTodoFilter === 'mine') {
+    list = list.filter(t => t.roleKey === currentRole);
+  } else if (currentTodoFilter === 'urgent') {
+    list = list.filter(t => t.priority === 'Urgent');
+  }
+
+  // Update counts
+  const allList = (erpState && erpState.todoList) ? erpState.todoList : (typeof DEFAULT_DATA !== 'undefined' ? DEFAULT_DATA.todoList : []);
+  const allCount = allList.filter(t => !t.completed).length;
+  const countSpan = document.getElementById('todoCountAll');
+  if (countSpan) countSpan.textContent = allCount;
+  
+  const badge = document.getElementById('topbarTodoBadge');
+  if (badge) {
+    badge.textContent = allCount;
+    badge.style.display = allCount === 0 ? 'none' : 'flex';
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 30px; text-align: center; color: #94a3b8; font-size: 13px;">
+        🎉 All operational tasks in this queue are completed!
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(item => {
+    const isDone = item.completed === true;
+    const prioColor = item.priority === 'Urgent' ? '#f87171' : (item.priority === 'High' ? '#fbbf24' : '#38bdf8');
+
+    return `
+      <div class="todo-item-card" style="opacity: ${isDone ? 0.6 : 1}; border-left: 3px solid ${prioColor};">
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <input type="checkbox" ${isDone ? 'checked' : ''} style="margin-top: 4px; cursor: pointer;" onchange="toggleTodoComplete('${item.id}')" />
+          <div style="flex: 1;" onclick="jumpToTodoStep('${item.jobRef}', '${item.step}')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #fff; text-decoration: ${isDone ? 'line-through' : 'none'}; cursor: pointer;">
+                ${item.title}
+              </h4>
+              <span style="font-size: 10px; font-weight: 800; color: ${prioColor}; background: rgba(255, 255, 255, 0.05); padding: 2px 6px; border-radius: 4px;">
+                ${item.priority}
+              </span>
+            </div>
+            <p style="margin: 3px 0 0; font-size: 11.5px; color: #94a3b8;">${item.subtitle}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px; color: #64748b;">
+              <span>Target: <strong>${item.due}</strong></span>
+              <span style="color: #38bdf8; font-weight: 700; cursor: pointer;">Jump to Step ➔</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterTodoList(filterType) {
+  currentTodoFilter = filterType;
+  document.querySelectorAll('.todo-filter-chip').forEach(c => c.classList.remove('active'));
+  
+  if (filterType === 'all') {
+    const chip = document.getElementById('chipTodoAll');
+    if (chip) chip.classList.add('active');
+  } else if (filterType === 'mine') {
+    const chip = document.getElementById('chipTodoMine');
+    if (chip) chip.classList.add('active');
+  } else if (filterType === 'urgent') {
+    const chip = document.getElementById('chipTodoUrgent');
+    if (chip) chip.classList.add('active');
+  }
+
+  renderTodoList();
+}
+
+function toggleTodoComplete(todoId) {
+  if (!erpState && typeof getERPData === 'function') {
+    erpState = getERPData();
+  }
+  const item = (erpState && erpState.todoList) ? erpState.todoList.find(t => t.id === todoId) : null;
+  if (item) {
+    item.completed = !item.completed;
+    saveERPData(erpState);
+    renderTodoList();
+    showToast(item.completed ? `Task marked complete!` : `Task marked active`, 'info');
+  }
+}
+
+function jumpToTodoStep(jobRef, stepKey) {
+  currentTab = 'operations';
+  selectedOpJobId = jobRef;
+  currentOpStep = stepKey;
+  closeTodoPanel();
+  
+  // Re-render sidebar to highlight Operations
+  renderSidebarForActiveRole();
+  renderCurrentTab();
+  showToast(`Jumped to Operations: ${stepKey} for Job #${jobRef}`, 'info');
+}
+
+// Global window bindings
+window.toggleTodoPanel = toggleTodoPanel;
+window.closeTodoPanel = closeTodoPanel;
+window.renderTodoList = renderTodoList;
+window.filterTodoList = filterTodoList;
+window.toggleTodoComplete = toggleTodoComplete;
+window.jumpToTodoStep = jumpToTodoStep;
 
 function openModal() {
   const modal = document.getElementById('globalModal');
