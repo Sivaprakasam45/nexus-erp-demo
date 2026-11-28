@@ -3,7 +3,7 @@
  * Implements strict Role-Based Access Control (RBAC) across 7 distinct personas.
  */
 
-const STORAGE_KEY = 'NEXUS_ERP_DEMO_DATA_V3_2';
+const STORAGE_KEY = 'NEXUS_ERP_DEMO_DATA_V3_3';
 
 // 9 Standard Unified ERP Modules (From System Design Sketch)
 const COMMON_ERP_MODULES = [
@@ -854,6 +854,16 @@ const DEFAULT_DATA = {
   purchaseOrders: [
     { poNo: 'PO-2026-781', jobNo: 'J000248', prNo: 'PR-9042', supplier: 'Parker Hydraulics Direct UK', amount: 2810.00, status: 'Approved & Placed', approvedBy: 'Marcus Sterling' },
     { poNo: 'PO-2026-782', jobNo: 'J000247', prNo: 'PR-9040', supplier: 'Hard Chrome International Ltd', amount: 1450.00, status: 'Pending Delivery', approvedBy: null }
+  ],
+
+  todoList: [
+    { id: 'TD-01', title: 'Review Inward Delivery Note & Equipment (ER000248)', subtitle: 'Customer: Riverside Plant • Equipment: Hydraulic Cylinder', step: 'receiving', jobRef: 'J000248', priority: 'High', roleKey: 'workshop_manager', due: 'Today, 2:00 PM' },
+    { id: 'TD-02', title: 'Submit & Sign Initial Inspection Report (IIR-2026-088)', subtitle: 'Job #J000248 • Dismantling & micrometer runout observations', step: 'initial_inspection', jobRef: 'J000248', priority: 'Urgent', roleKey: 'workshop_manager', due: 'Today, 4:00 PM' },
+    { id: 'TD-03', title: 'Approve Repair Cost Estimation & Send to Sales', subtitle: 'Job #J000248 • Selling Price $9,024.05 with 18% gross margin', step: 'cost_estimations', jobRef: 'J000248', priority: 'Urgent', roleKey: 'workshop_manager', due: 'Today, 5:30 PM' },
+    { id: 'TD-04', title: 'Assign Lead Technician & Bay Schedule', subtitle: 'Job #J000248 • Allocate to Raj Kumar & Bay Lathe #3', step: 'assign_job', jobRef: 'J000248', priority: 'Medium', roleKey: 'workshop_manager', due: 'Tomorrow, 9:00 AM' },
+    { id: 'TD-05', title: 'Approve Hard-Chrome Rod Purchase Order (PO-2026-782)', subtitle: 'Job #J000247 • Supplier: Hard Chrome International ($1,450.00)', step: 'cost_estimations', jobRef: 'J000247', priority: 'High', roleKey: 'country_manager', due: 'Today, 6:00 PM' },
+    { id: 'TD-06', title: 'Calibrate & Digitally Sign 350-Bar Test Report', subtitle: 'Job #J000245 • Proof pressure & flow rate certification', step: 'test_report', jobRef: 'J000245', priority: 'High', roleKey: 'qa_inspector', due: 'Tomorrow, 11:00 AM' },
+    { id: 'TD-07', title: 'Complete Pre-dispatch Checklist & Generate DN', subtitle: 'Job #J000245 • Cleaning, painting, accessories & packing verify', step: 'pre_dispatch', jobRef: 'J000245', priority: 'Normal', roleKey: 'qa_inspector', due: '28-Nov-2026' }
   ]
 };
 
@@ -866,6 +876,9 @@ function getERPData() {
     }
     const parsed = JSON.parse(raw);
     parsed.commonModules = COMMON_ERP_MODULES;
+    if (!parsed.todoList) {
+      parsed.todoList = DEFAULT_DATA.todoList;
+    }
     if (!parsed.rbac || !parsed.users) {
       parsed.rbac = RBAC_CONFIG;
       parsed.users = DEFAULT_USERS;

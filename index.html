@@ -214,6 +214,13 @@
             <span class="bar"></span>
             <span class="bar"></span>
           </button>
+
+          <!-- Quick Action TODO Button (Marked in screenshot) -->
+          <button class="topbar-todo-pill" id="topbarTodoBtn" onclick="toggleTodoPanel()" title="Operations To-Do List">
+            <span class="todo-pill-icon">📋</span>
+            <span class="todo-pill-label">TODO</span>
+            <span class="todo-pill-badge" id="topbarTodoBadge">7</span>
+          </button>
           
           <div class="mobile-brand-title">
             <strong>NEXUS ERP</strong>
@@ -348,11 +355,40 @@
     </div>
   </div>
 
+  <!-- Slide-out Operations TODO Drawer Panel -->
+  <div class="todo-drawer-backdrop" id="todoBackdrop" onclick="closeTodoPanel()"></div>
+  <aside class="todo-drawer" id="todoDrawer">
+    <div class="todo-drawer-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">📋</span>
+        <div>
+          <h3 style="margin: 0; font-size: 15px; color: #fff; font-weight: 800;">Operational To-Do Queue</h3>
+          <span style="font-size: 11px; color: #94a3b8;">Pending Operations Tasks & Approvals</span>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closeTodoPanel()">✕</button>
+    </div>
+    <div class="todo-filter-row">
+      <button class="todo-filter-chip active" id="chipTodoAll" onclick="filterTodoList('all')">All (<span id="todoCountAll">7</span>)</button>
+      <button class="todo-filter-chip" id="chipTodoMine" onclick="filterTodoList('mine')">For Active Role</button>
+      <button class="todo-filter-chip" id="chipTodoUrgent" onclick="filterTodoList('urgent')">Urgent</button>
+    </div>
+    <div class="todo-list-container" id="todoListContainer">
+      <!-- Injected via JavaScript -->
+    </div>
+    <div class="todo-drawer-footer">
+      <button class="quick-action-btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="openNewJobCardModal(); closeTodoPanel();">
+        <span>➕</span> Create New Job Card (Video Flow)
+      </button>
+    </div>
+  </aside>
+
   <!-- Toast Notifications Container -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Scripts -->
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/operations.js"></script>
 </body>
 </html>

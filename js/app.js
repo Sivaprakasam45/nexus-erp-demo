@@ -6,6 +6,10 @@
 let erpState = null;
 let currentTab = 'dashboard';
 let currentFilter = 'all';
+let currentOpStep = 'receiving';
+let selectedOpJobId = 'J000248';
+let currentJobStageFilter = 'all';
+let currentTodoFilter = 'all';
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', () => {
@@ -1119,9 +1123,7 @@ function getQADashboardHTML() {
 }
 
 // 3H. COMMON VIEWS (Operations, Enquiries, Assets, Settings)
-function getOperationsModuleHTML() {
-  return getWorkshopDashboardHTML();
-}
+// Full 10-step Operations workflow is defined in js/operations.js
 
 function getAssignmentsViewHTML() {
   return `
@@ -1299,10 +1301,18 @@ function showToast(message, type = 'info') {
 
 function updateTopbarNotifications() {
   const badge = document.getElementById('notificationBadgeCount');
-  const unreadCount = erpState.notifications.filter(n => n.unread).length;
+  const unreadCount = erpState.notifications ? erpState.notifications.filter(n => n.unread).length : 0;
   if (badge) {
     badge.textContent = unreadCount || 3;
     badge.style.display = unreadCount === 0 ? 'none' : 'flex';
+  }
+
+  // Update prominent Operations To-Do Pill Badge
+  const todoBadge = document.getElementById('topbarTodoBadge');
+  if (todoBadge) {
+    const pendingTodos = erpState.todoList ? erpState.todoList.filter(t => !t.completed).length : 7;
+    todoBadge.textContent = pendingTodos;
+    todoBadge.style.display = pendingTodos === 0 ? 'none' : 'flex';
   }
 }
 
