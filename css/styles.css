@@ -2070,3 +2070,157 @@ code, .mono {
   }
 }
 
+/* Video 2 Flow: Stage Strip & Clean Report Styles */
+.stage-strip-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.stage-strip-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.stage-strip-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+.stage-strip-pill.active {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.4);
+}
+.stage-strip-pill.completed {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+/* Live Photo Gallery Thumbnails with Delete button */
+.stage-photo-gallery {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.stage-photo-card {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+}
+.stage-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.stage-photo-card .photo-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+.stage-photo-card .photo-caption {
+  font-size: 10px;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+.stage-photo-card .photo-delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.stage-photo-card .photo-delete-btn:hover {
+  background: #dc2626;
+}
+
+/* Signed Status Banner */
+.signed-status-banner {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.signed-status-text {
+  font-size: 12px;
+  color: #6ee7b7;
+}
+
+/* Clean Document Report Preview (White Sheet matching Video PDF View) */
+.clean-report-sheet {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 28px;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.clean-report-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.clean-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+.clean-report-table tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+.clean-report-table td {
+  padding: 8px 6px;
+  font-size: 12.5px;
+}
+.clean-report-table td.label-col {
+  color: #64748b;
+  width: 35%;
+  font-weight: 600;
+}
+.clean-report-table td.val-col {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+

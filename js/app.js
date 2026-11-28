@@ -1570,39 +1570,159 @@ function openNewEnquiryModal() {
     const title = document.getElementById('modalTitle');
     const body = document.getElementById('modalBody');
     const footer = document.getElementById('modalFooter');
-    title.textContent = "Create Customer Enquiry";
+    title.textContent = "New enquiry";
     body.innerHTML = `
-      <div class="form-grid">
-        <div class="form-group"><label>Customer Name</label><input type="text" id="mCust" value="Petro Energy Ltd"></div>
-        <div class="form-group"><label>Equipment</label><input type="text" id="mEquip" value="Directional Control Valve"></div>
-        <div class="form-group"><label>Model</label><input type="text" id="mModel" value="PVG-32"></div>
-        <div class="form-group"><label>Serial Number</label><input type="text" id="mSerial" value="VLV-9921"></div>
-        <div class="form-group col-span-2"><label>Complaint</label><textarea id="mComp" rows="2">Internal spool sticking and actuator sluggishness.</textarea></div>
-      </div>
+      <form id="newEnquiryForm" onsubmit="event.preventDefault(); handleNewEnquirySave();" style="font-size: 13px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Customer name:</label>
+            <input type="text" id="mCust" class="erp-input" value="Avhha Mining Ltd" style="width: 100%; margin-top: 4px;" required>
+          </div>
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Contact number:</label>
+            <input type="text" id="mContact" class="erp-input" value="5518" style="width: 100%; margin-top: 4px;" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Salesperson:</label>
+            <input type="text" id="mSales" class="erp-input" value="Ahivv" style="width: 100%; margin-top: 4px;" required>
+          </div>
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Priority:</label>
+            <select id="mPriority" class="erp-select" style="width: 100%; margin-top: 4px;">
+              <option value="Normal">Normal</option>
+              <option value="High" selected>High</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Serial number:</label>
+            <input type="text" id="mSerial" class="erp-input" value="Thiabjk" style="width: 100%; margin-top: 4px;" required>
+          </div>
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Equipment type:</label>
+            <select id="mEquipType" class="erp-select" style="width: 100%; margin-top: 4px;">
+              <option value="Cylinder" selected>Cylinder</option>
+              <option value="Pump">Pump</option>
+              <option value="Motor">Motor</option>
+              <option value="Valve">Valve</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Manufacturer:</label>
+            <input type="text" id="mManufacturer" class="erp-input" value="Shvvan" style="width: 100%; margin-top: 4px;" required>
+          </div>
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Model:</label>
+            <input type="text" id="mModel" class="erp-input" value="Annab" style="width: 100%; margin-top: 4px;" required>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Customer complaint:</label>
+          <textarea id="mComp" class="erp-input" rows="2" style="width: 100%; margin-top: 4px;" required>Repair</textarea>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Target completion date:</label>
+          <input type="date" id="mTargetDate" class="erp-input" value="2026-12-05" style="width: 100%; margin-top: 4px;" required>
+        </div>
+      </form>
     `;
     footer.innerHTML = `
       <button class="quick-action-btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="quick-action-btn btn-primary" onclick="handleNewEnquirySave()">Save Enquiry</button>
+      <button class="quick-action-btn btn-primary" onclick="handleNewEnquirySave()">Create enquiry</button>
     `;
     openModal();
   });
 }
 
 function handleNewEnquirySave() {
-  const enqId = 'ENQ-2026-' + Math.floor(100 + Math.random() * 900);
-  erpState.enquiries.unshift({
+  const nextEnqNum = (erpState.enquiries ? erpState.enquiries.length + 1 : 2).toString().padStart(4, '0');
+  const enqId = 'ENQ-' + nextEnqNum;
+  const jobId = 'J000' + (249 + (erpState.jobs ? erpState.jobs.length : 0));
+
+  const cust = document.getElementById('mCust').value;
+  const contact = document.getElementById('mContact').value;
+  const sales = document.getElementById('mSales').value;
+  const priority = document.getElementById('mPriority').value;
+  const serial = document.getElementById('mSerial').value;
+  const equipType = document.getElementById('mEquipType').value;
+  const manufacturer = document.getElementById('mManufacturer').value;
+  const model = document.getElementById('mModel').value;
+  const complaint = document.getElementById('mComp').value;
+  const targetDate = document.getElementById('mTargetDate').value;
+
+  const newEnq = {
     id: enqId,
-    customer: document.getElementById('mCust').value,
-    equipment: document.getElementById('mEquip').value,
-    model: document.getElementById('mModel').value,
-    serialNo: document.getElementById('mSerial').value,
-    complaint: document.getElementById('mComp').value,
-    status: 'Pending Receiving',
-    contactPerson: 'Alex Turner'
-  });
+    customer: cust,
+    contactNumber: contact,
+    salesPerson: sales,
+    priority: priority,
+    serialNumber: serial,
+    equipment: equipType,
+    manufacturer: manufacturer,
+    model: model,
+    problem: complaint,
+    targetDate: targetDate,
+    status: 'Inward Receiving',
+    date: '28-Nov-2026'
+  };
+
+  const newJob = {
+    id: jobId,
+    enquiryId: enqId,
+    customer: cust,
+    contactNumber: contact,
+    salesPerson: sales,
+    priority: priority,
+    equipment: equipType,
+    manufacturer: manufacturer,
+    model: model,
+    serialNumber: serial,
+    problem: complaint,
+    targetDate: targetDate,
+    status: 'In Progress',
+    stage: 'Receiving',
+    technician: 'Raj Kumar',
+    date: '28-Nov-2026',
+    customerDnNo: 'Thabk / DN-2026-991',
+    quantityReceived: '8 Units',
+    conditionAtReceiving: 'Right',
+    accessoriesReceived: 'Ghjjb / Port Plugs & Hardware',
+    missingAccessories: '-NA-',
+    technicianRemarks: 'Need approval',
+    bore: '180 mm',
+    rod: '80 mm',
+    stroke: '1,200 mm',
+    testPressure: '310 Bar',
+    sealKit: 'Need new (Viton heavy-duty)',
+    labourCharge: '$1,530.00',
+    partsUsed: [
+      { name: 'Parker PVP Viton Seal Kit', qty: '1 Kit' },
+      { name: 'FAG High-Load Shaft Bearing', qty: '2 Pcs' }
+    ]
+  };
+
+  erpState.enquiries.unshift(newEnq);
+  erpState.jobs.unshift(newJob);
+  selectedOpJobId = jobId;
+  currentOpStep = 'receiving';
   saveERPData(erpState);
   closeModal();
-  showToast(`Enquiry ${enqId} registered!`, 'success');
+  showToast(`Enquiry ${enqId} created & Job ${jobId} initialized in Receiving!`, 'success');
+
+  // Jump straight to the job stage report workflow
+  currentTab = 'operations';
+  renderSidebarForActiveRole();
   renderCurrentTab();
 }
 

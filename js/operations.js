@@ -104,13 +104,37 @@ function getOperationsModuleHTML() {
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
           <span style="font-size: 12px; color: #cbd5e1;">Assigned: <strong>${job.technician || 'Raj Kumar'}</strong></span>
           <span class="badge ${job.status.includes('Completed') ? 'badge-success' : 'badge-info'}" style="padding: 5px 12px; font-size: 12px;">
             ${job.status}
           </span>
+          <button class="quick-action-btn btn-primary" onclick="openFullJobReportModal('${job.id}')" style="padding: 5px 12px; font-size: 12px;">
+            <span>📄</span> Full Job Report
+          </button>
         </div>
       </div>
+    </div>
+
+    <!-- Video Workflow Stage Tracker Strip (From WhatsApp Video Demonstration) -->
+    <div class="stage-strip-container">
+      <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 800; align-self: center; margin-right: 6px;">
+        STAGES:
+      </span>
+      ${[
+        { id: 'receiving', title: 'Receiving', icon: '📥' },
+        { id: 'dismantling', title: 'Dismantling', icon: '🔩' },
+        { id: 'cleaning', title: 'Cleaning', icon: '🧼' },
+        { id: 'initial_inspection', title: 'Inspection', icon: '🔍' },
+        { id: 'cost_estimations', title: 'Repair and quote', icon: '💰' },
+        { id: 'assembly_checklist', title: 'Repair', icon: '🔧' },
+        { id: 'test_report', title: 'Testing', icon: '⚡' },
+        { id: 'pre_dispatch', title: 'Pre-dispatch', icon: '📋' }
+      ].map(stg => `
+        <button class="stage-strip-pill ${(currentOpStep || 'receiving') === stg.id ? 'active' : ''}" onclick="switchOpStep('${stg.id}')">
+          <span>${stg.icon}</span> ${stg.title}
+        </button>
+      `).join('')}
     </div>
 
     <!-- 10-Step Operations Horizontal Stepper Bar (Matching Excel Sheet Tabs) -->
@@ -205,6 +229,10 @@ function getOpStepContentHTML(stepId, job) {
   switch (stepId) {
     case 'receiving':
       return getOpStepReceivingHTML(job);
+    case 'dismantling':
+      return getOpStepDismantlingHTML(job);
+    case 'cleaning':
+      return getOpStepCleaningHTML(job);
     case 'initial_inspection':
       return getOpStepInspectionHTML(job);
     case 'cost_estimations':
@@ -242,7 +270,10 @@ function getOpStepReceivingHTML(job) {
             Register customer delivery, verify equipment specifications, upload signed inward note, and capture physical intake photos.
           </p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="quick-action-btn btn-primary" onclick="openStageReportModal('receiving', '${job.id}')">
+            <span>📑</span> Stage Report
+          </button>
           <button class="quick-action-btn btn-outline" onclick="showToast('Inward Receiving Slip printed!', 'info')">
             <span>🖨️</span> Print Slip
           </button>
@@ -397,6 +428,97 @@ function getOpStepReceivingHTML(job) {
         </div>
       </div>
 
+      <!-- Receiving Inward Parameters & Photo Gallery matching WhatsApp Video -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 18px; margin: 20px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+            <span>📦</span> Inward Registration Parameters (Video Flow)
+          </h4>
+          <button type="button" class="quick-action-btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="openStageReportModal('receiving', '${job.id}')">
+            <span>📑</span> Stage Report
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Customer Delivery Note Number:</label>
+            <input type="text" id="recDnNo" class="erp-input" value="${job.customerDnNo || 'Thabk / DN-CRN-88219'}" style="width: 100%; margin-top: 4px;" />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Quantity Received:</label>
+            <input type="text" id="recQty" class="erp-input" value="${job.quantityReceived || '8 Units'}" style="width: 100%; margin-top: 4px;" />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Condition at Receiving:</label>
+            <input type="text" id="recCondition" class="erp-input" value="${job.conditionAtReceiving || 'Right'}" style="width: 100%; margin-top: 4px;" />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Accessories Received:</label>
+            <input type="text" id="recAccessories" class="erp-input" value="${job.accessoriesReceived || 'Ghjjb / Port Plugs & Bolts'}" style="width: 100%; margin-top: 4px;" />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Missing or Damaged Accessories:</label>
+            <input type="text" id="recMissingAcc" class="erp-input" value="${job.missingAccessories || '-NA-'}" style="width: 100%; margin-top: 4px;" />
+          </div>
+        </div>
+
+        <!-- Live Photo Gallery with Delete Buttons matching Video -->
+        <div style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">
+              Photos (${(job.photos || []).length || 3}):
+            </label>
+            <button type="button" class="quick-action-btn btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="addPhotoToStage('receiving', '${job.id}')">
+              <span>📷</span> Take or add photos
+            </button>
+          </div>
+          
+          <div class="stage-photo-gallery">
+            ${((job.photos && job.photos.length) ? job.photos : [
+              { name: 'As-Received Overall Assembly', icon: '📷' },
+              { name: 'Gland Collar & Flange Condition', icon: '📷' },
+              { name: 'Serial & Manufacturer Nameplate', icon: '📷' }
+            ]).map((p, idx) => `
+              <div class="stage-photo-card">
+                <button type="button" class="photo-delete-btn" onclick="removePhotoFromStage('receiving', '${job.id}', ${idx})" title="Delete Photo">✕</button>
+                <div class="photo-icon">${p.icon || '📷'}</div>
+                <div class="photo-caption">${p.name || 'Photo #' + (idx + 1)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Technician Remarks -->
+        <div style="margin-top: 14px;">
+          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Technician Remarks:</label>
+          <textarea id="recTechRemarks" class="erp-input" rows="2" style="width: 100%; margin-top: 4px;">${job.technicianRemarks || 'Need approval'}</textarea>
+        </div>
+
+        <!-- Sign and Submit Flow from Video -->
+        <div style="margin-top: 16px;">
+          ${job.receivingSigned ? `
+            <div class="signed-status-banner">
+              <span class="signed-status-text">
+                ✓ Signed: <strong>${job.receivingSigner || '123 (Technician)'}</strong> on ${job.receivingSignedDate || '27 Nov 2026 at 10:28 AM'}. Waiting for a different manager to approve.
+              </span>
+              <button class="quick-action-btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="openStageReportModal('receiving', '${job.id}')">
+                <span>📑</span> Stage Report
+              </button>
+            </div>
+          ` : `
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button class="quick-action-btn btn-success" onclick="signAndSubmitStage('receiving', '${job.id}')" style="padding: 9px 18px; font-size: 13px;">
+                <span>✍️</span> Sign and submit
+              </button>
+            </div>
+          `}
+        </div>
+      </div>
+
       <!-- Upload Document Box matching Excel Sheet -->
       <div style="background: rgba(15, 23, 42, 0.6); border: 2px dashed rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 20px; text-align: center; margin-top: 16px;">
         <span style="font-size: 32px;">📄</span>
@@ -416,9 +538,147 @@ function getOpStepReceivingHTML(job) {
 
       <!-- Bottom Step Progression -->
       <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
-        <button class="quick-action-btn btn-primary" onclick="switchOpStep('initial_inspection')" style="padding: 10px 20px; font-size: 13.5px;">
-          Proceed to 2. Initial Inspection & 2.1 Assessment ➔
+        <button class="quick-action-btn btn-primary" onclick="switchOpStep('dismantling')" style="padding: 10px 20px; font-size: 13.5px;">
+          Proceed to Stage 1 – Dismantling ➔
         </button>
+      </div>
+    </div>
+  `;
+}
+
+// ==========================================
+// 2A.1 STAGE 1: DISMANTLING (Video Flow)
+// ==========================================
+function getOpStepDismantlingHTML(job) {
+  return `
+    <div class="op-sheet-card">
+      <div class="op-sheet-header">
+        <div>
+          <span class="badge badge-warning" style="margin-bottom: 6px; font-weight: 800;">STAGE 1 • DISMANTLING</span>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #fff;">Dismantling & Teardown Stage</h3>
+          <p style="margin: 2px 0 0; font-size: 12px; color: #94a3b8;">
+            Disassemble components, extract piston rod, record dimensional wear, and capture teardown proof photos.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="quick-action-btn btn-primary" onclick="openStageReportModal('dismantling', '${job.id}')">
+            <span>📑</span> Stage Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Checklist & Observations -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 12px; font-size: 13.5px; font-weight: 800; color: #38bdf8;">Teardown Activities & Micrometer Measurements:</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+          <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 6px;">
+            <label style="font-size: 11px; color: #64748b; font-weight: 700;">ROD GLAND & WIPER SEAL REMOVAL:</label>
+            <div style="font-size: 13px; font-weight: 600; color: #f1f5f9; margin-top: 4px;">Extracted with brass drift; zero scoring to gland housing.</div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 6px;">
+            <label style="font-size: 11px; color: #64748b; font-weight: 700;">PISTON NUT BREAKOUT TORQUE:</label>
+            <div style="font-size: 13px; font-weight: 600; color: #38bdf8; margin-top: 4px;">Required 1,450 Nm with induction heat assist.</div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 6px;">
+            <label style="font-size: 11px; color: #64748b; font-weight: 700;">SHAFT TIR RUNOUT (DIAL INDICATOR):</label>
+            <div style="font-size: 13px; font-weight: 600; color: #f87171; margin-top: 4px;">0.42 mm (Exceeds permissible 0.05 mm).</div>
+          </div>
+        </div>
+
+        <!-- Photos -->
+        <div style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Dismantling Proof Photos:</label>
+            <button type="button" class="quick-action-btn btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="addPhotoToStage('dismantling', '${job.id}')">
+              <span>📷</span> Take or add photos
+            </button>
+          </div>
+          <div class="stage-photo-gallery">
+            <div class="stage-photo-card"><div class="photo-icon">📷</div><div class="photo-caption">Rod Teardown</div></div>
+            <div class="stage-photo-card"><div class="photo-icon">📷</div><div class="photo-caption">Piston Chevron Wear</div></div>
+          </div>
+        </div>
+
+        <!-- Remarks & Sign -->
+        <div style="margin-top: 14px;">
+          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Technician Remarks:</label>
+          <textarea class="erp-input" rows="2" style="width: 100%; margin-top: 4px;">Piston rod scored at 450mm mark. Honing and new induction hardened rod required.</textarea>
+        </div>
+
+        <div style="margin-top: 16px;">
+          ${job.dismantlingSigned ? `
+            <div class="signed-status-banner">
+              <span class="signed-status-text">✓ Signed: <strong>${job.dismantlingSigner || 'Raj Kumar (Technician)'}</strong>. Waiting for manager approval.</span>
+            </div>
+          ` : `
+            <div style="display: flex; justify-content: flex-end;">
+              <button class="quick-action-btn btn-success" onclick="signAndSubmitStage('dismantling', '${job.id}')"><span>✍️</span> Sign and submit</button>
+            </div>
+          `}
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+        <button class="quick-action-btn btn-outline" onclick="switchOpStep('receiving')">⬅ Back to Receiving</button>
+        <button class="quick-action-btn btn-primary" onclick="switchOpStep('cleaning')">Proceed to Cleaning ➔</button>
+      </div>
+    </div>
+  `;
+}
+
+// ==========================================
+// 2A.2 STAGE 2: CLEANING (Video Flow)
+// ==========================================
+function getOpStepCleaningHTML(job) {
+  return `
+    <div class="op-sheet-card">
+      <div class="op-sheet-header">
+        <div>
+          <span class="badge badge-info" style="margin-bottom: 6px; font-weight: 800;">STAGE 2 • CLEANING & DEGREASING</span>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #fff;">Degreasing & Ultrasonic Cleaning Stage</h3>
+          <p style="margin: 2px 0 0; font-size: 12px; color: #94a3b8;">
+            Chemical degreasing, ultrasonic cleaning tank cycle, hot air drying, and surface contamination testing.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="quick-action-btn btn-primary" onclick="openStageReportModal('cleaning', '${job.id}')">
+            <span>📑</span> Stage Report
+          </button>
+        </div>
+      </div>
+
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+          <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 6px;">
+            <label style="font-size: 11px; color: #64748b; font-weight: 700;">ULTRASONIC TANK DEGREASING CYCLE:</label>
+            <div style="font-size: 13px; font-weight: 600; color: #34d399; margin-top: 4px;">45 Min @ 65°C (Alkaline solvent bath)</div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 6px;">
+            <label style="font-size: 11px; color: #64748b; font-weight: 700;">RESIDUAL PARTICULATE INSPECTION:</label>
+            <div style="font-size: 13px; font-weight: 600; color: #38bdf8; margin-top: 4px;">ISO 4406 Cleanliness Code 16/14/11 Achieved</div>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 6px;">
+            <label style="font-size: 11px; color: #64748b; font-weight: 700;">HOT AIR DRYING & INHIBITOR OIL:</label>
+            <div style="font-size: 13px; font-weight: 600; color: #f1f5f9; margin-top: 4px;">De-watered and misted with ISO VG 10 protective oil.</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          ${job.cleaningSigned ? `
+            <div class="signed-status-banner">
+              <span class="signed-status-text">✓ Signed: <strong>${job.cleaningSigner || 'Raj Kumar (Technician)'}</strong>. Waiting for manager approval.</span>
+            </div>
+          ` : `
+            <div style="display: flex; justify-content: flex-end;">
+              <button class="quick-action-btn btn-success" onclick="signAndSubmitStage('cleaning', '${job.id}')"><span>✍️</span> Sign and submit</button>
+            </div>
+          `}
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+        <button class="quick-action-btn btn-outline" onclick="switchOpStep('dismantling')">⬅ Back to Dismantling</button>
+        <button class="quick-action-btn btn-primary" onclick="switchOpStep('initial_inspection')">Proceed to Inspection ➔</button>
       </div>
     </div>
   `;
@@ -1962,3 +2222,281 @@ function saveNewJobCard(e) {
   renderCurrentTab();
   showToast(`Job Card #${nextId} created successfully!`, 'success');
 }
+
+// ==========================================
+// 6. VIDEO 2 FLOW: STAGE REPORTS & SIGN OFF
+// ==========================================
+function openStageReportModal(stageKey, jobId) {
+  const job = erpState.jobs.find(j => j.id === jobId) || erpState.jobs[0];
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  const footer = document.getElementById('modalFooter');
+
+  const stageNames = {
+    receiving: 'Receiving',
+    dismantling: 'Dismantling',
+    cleaning: 'Cleaning',
+    initial_inspection: 'Inspection',
+    cost_estimations: 'Repair & Costing',
+    assembly_checklist: 'Assembly',
+    test_report: 'Testing',
+    pre_dispatch: 'Pre-dispatch'
+  };
+
+  const stageTitle = stageNames[stageKey] || 'Stage';
+  title.textContent = `${stageTitle} Report Preview`;
+
+  body.innerHTML = `
+    <div class="clean-report-sheet">
+      <div class="clean-report-title">
+        <div>
+          <div style="font-size: 19px; font-weight: 800; color: #0284c7;">${stageTitle} report</div>
+          <div style="font-size: 11px; color: #64748b; font-weight: normal; margin-top: 2px;">NEXUS INDUSTRIAL SERVICE DESK ERP</div>
+        </div>
+        <div style="text-align: right; font-size: 11px; color: #475569; font-weight: normal;">
+          Report ID: <strong>REP-${job.id}-${stageKey.toUpperCase()}</strong><br>
+          Generated: 28-Nov-2026
+        </div>
+      </div>
+
+      <table class="clean-report-table">
+        <tbody>
+          <tr>
+            <td class="label-col">Enquiry / job</td>
+            <td class="val-col" style="color: #0284c7;">${job.id} (${job.enquiryId || 'ENQ-0002'})</td>
+          </tr>
+          <tr>
+            <td class="label-col">Customer</td>
+            <td class="val-col">${job.customer} (${job.contactNumber || '5518'})</td>
+          </tr>
+          <tr>
+            <td class="label-col">Equipment</td>
+            <td class="val-col">${job.equipment} ${job.manufacturer || 'Shvvan'} ${job.model || 'Annab'}, serial ${job.serialNumber || 'Thiabjk'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Complaint</td>
+            <td class="val-col">${job.problem || 'Repair'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Enquiry date</td>
+            <td class="val-col">${job.date || '2026-11-27'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Customer delivery note number</td>
+            <td class="val-col">${job.customerDnNo || 'Thabk / DN-CRN-88219'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Quantity received</td>
+            <td class="val-col">${job.quantityReceived || '8 Units'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Condition at receiving</td>
+            <td class="val-col">${job.conditionAtReceiving || 'Right'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Accessories received</td>
+            <td class="val-col">${job.accessoriesReceived || 'Ghjjb / Port Plugs & Hardware'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Missing or damaged accessories</td>
+            <td class="val-col">${job.missingAccessories || '-NA-'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Technician remarks</td>
+            <td class="val-col">${job.technicianRemarks || 'Need approval'}</td>
+          </tr>
+          <tr>
+            <td class="label-col">Signatures</td>
+            <td class="val-col" style="color: #16a34a;">
+              ✓ Signed: ${job[stageKey + 'Signer'] || '123 (Technician)'}, 27 Nov 2026 at 10:28 AM.<br>
+              <span style="color: #64748b; font-size: 11px;">Waiting for a different manager to approve.</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  footer.innerHTML = `
+    <button class="quick-action-btn btn-outline" onclick="closeModal()">Close</button>
+    <button class="quick-action-btn btn-primary" onclick="showToast('Printing or saving PDF (${stageTitle}_Report_${job.id}.pdf)...', 'success'); closeModal();">
+      <span>🖨️</span> Print or save as PDF
+    </button>
+  `;
+
+  openModal();
+}
+
+function openFullJobReportModal(jobId) {
+  const job = erpState.jobs.find(j => j.id === jobId) || erpState.jobs[0];
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  const footer = document.getElementById('modalFooter');
+
+  title.textContent = `Full Job Report - ${job.id}`;
+
+  body.innerHTML = `
+    <div class="clean-report-sheet">
+      <div class="clean-report-title">
+        <div>
+          <div style="font-size: 20px; font-weight: 800; color: #0284c7;">NEXUS FULL JOB LIFECYCLE REPORT</div>
+          <div style="font-size: 11px; color: #64748b; font-weight: normal; margin-top: 2px;">Comprehensive Technical & Overhaul Audit</div>
+        </div>
+        <div style="text-align: right; font-size: 11px; color: #475569; font-weight: normal;">
+          Job No: <strong style="color: #0284c7;">${job.id}</strong><br>
+          Enquiry: ${job.enquiryId || 'ENQ-0002'}
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px;">
+          <div><strong>Customer:</strong> ${job.customer}</div>
+          <div><strong>Equipment:</strong> ${job.equipment} (${job.model || 'Heavy-Duty'})</div>
+          <div><strong>Serial Number:</strong> ${job.serialNumber || '2026-HC-8912'}</div>
+          <div><strong>Complaint / Scope:</strong> ${job.problem || 'Overhaul & Seal Replacement'}</div>
+        </div>
+      </div>
+
+      <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin: 16px 0 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">
+        1. STAGE PROGRESSION SUMMARY:
+      </div>
+      <table class="clean-report-table">
+        <tbody>
+          <tr><td class="label-col">Stage 1: Inward Receiving</td><td class="val-col">DN: ${job.customerDnNo || 'DN-CRN-88219'} • Qty: ${job.quantityReceived || '1'} • Condition: Right</td></tr>
+          <tr><td class="label-col">Stage 2: Dismantling & Cleaning</td><td class="val-col">Ultrasonic degreased • Shaft runout 0.42 mm • Honing required</td></tr>
+          <tr><td class="label-col">Stage 3: Initial Inspection</td><td class="val-col">Findings logged • Barrel Repair / Rod Replace / Gland Replace</td></tr>
+          <tr><td class="label-col">Stage 4: Costing & Quotation</td><td class="val-col">Total Selling Price: <strong>$5,376.74</strong> (18% gross margin) • Dispatched to Sales</td></tr>
+          <tr><td class="label-col">Stage 5: Assembly & Wrench Time</td><td class="val-col">Lead Tech: Raj Kumar • Elapsed wrench time: 4.5 hrs • 850 Nm torqued</td></tr>
+          <tr><td class="label-col">Stage 6: 350-Bar Hydro Testing</td><td class="val-col" style="color: #16a34a; font-weight: 800;">PASSED • 15 Min Holding Time • 0 Drops Leakage</td></tr>
+          <tr><td class="label-col">Stage 7: Pre-dispatch & DN</td><td class="val-col">RAL 5015 topcoat • Port plugs installed • Delivery Note generated</td></tr>
+        </tbody>
+      </table>
+
+      <div style="display: flex; justify-content: space-between; margin-top: 24px; padding-top: 12px; border-top: 1px solid #cbd5e1; font-size: 11px;">
+        <div>Signed by Lead Technician: <strong>Raj Kumar (Emp #TK-802)</strong></div>
+        <div>Approved by Workshop Manager: <strong>David Miller (Emp #WM-002)</strong></div>
+      </div>
+    </div>
+  `;
+
+  footer.innerHTML = `
+    <button class="quick-action-btn btn-outline" onclick="closeModal()">Close</button>
+    <button class="quick-action-btn btn-primary" onclick="showToast('Downloading Full Job Lifecycle PDF...', 'success'); closeModal();">
+      <span>🖨️</span> Print or save as PDF
+    </button>
+  `;
+
+  openModal();
+}
+
+function signAndSubmitStage(stageKey, jobId) {
+  const job = erpState.jobs.find(j => j.id === jobId) || erpState.jobs[0];
+  const currentUser = erpState.currentUser ? erpState.currentUser.name : 'Raj Kumar';
+  const currentRole = erpState.currentUser ? erpState.currentUser.roleKey : 'Technician';
+
+  job[stageKey + 'Signed'] = true;
+  job[stageKey + 'Signer'] = `${currentUser} (${currentRole})`;
+  job[stageKey + 'SignedDate'] = new Date().toLocaleString();
+
+  saveERPData(erpState);
+  renderCurrentTab();
+  showToast(`Stage '${stageKey}' signed by ${currentUser}! Waiting for manager approval.`, 'success');
+}
+
+function addPhotoToStage(stageKey, jobId) {
+  const job = erpState.jobs.find(j => j.id === jobId) || erpState.jobs[0];
+  if (!job.photos) job.photos = [];
+  
+  const photoNames = [
+    'Bore Surface Profilometer Scan',
+    'Rod Gland Bushing Play',
+    'Port Flange Thread Verification',
+    'Ultrasonic Cleaning Finish',
+    'Piston Seal Seating Check'
+  ];
+  const nextName = photoNames[job.photos.length % photoNames.length];
+  job.photos.push({ name: nextName, icon: '📷' });
+
+  saveERPData(erpState);
+  renderCurrentTab();
+  showToast(`Photo added: "${nextName}"`, 'info');
+}
+
+function removePhotoFromStage(stageKey, jobId, idx) {
+  const job = erpState.jobs.find(j => j.id === jobId) || erpState.jobs[0];
+  if (job.photos && job.photos.length > idx) {
+    job.photos.splice(idx, 1);
+    saveERPData(erpState);
+    renderCurrentTab();
+    showToast('Photo removed', 'info');
+  }
+}
+
+// "Who is using this device?" User Switcher Modal matching Video
+function openDeviceUserModal() {
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  const footer = document.getElementById('modalFooter');
+
+  title.textContent = "Who is using this device?";
+  body.innerHTML = `
+    <div style="font-size: 13px;">
+      <p style="color: #94a3b8; margin-bottom: 16px;">
+        Your name and role are printed on signatures and approvals.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Name:</label>
+          <input type="text" id="deviceUserName" class="erp-input" value="${erpState.currentUser ? erpState.currentUser.name : 'Raj Kumar'}" style="width: 100%; margin-top: 4px;" required />
+        </div>
+
+        <div>
+          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Role:</label>
+          <select id="deviceUserRole" class="erp-select" style="width: 100%; margin-top: 4px;">
+            <option value="technician" ${erpState.currentUser && erpState.currentUser.roleKey === 'technician' ? 'selected' : ''}>Technician</option>
+            <option value="workshop_manager" ${erpState.currentUser && erpState.currentUser.roleKey === 'workshop_manager' ? 'selected' : ''}>Workshop Manager</option>
+            <option value="qa_inspector" ${erpState.currentUser && erpState.currentUser.roleKey === 'qa_inspector' ? 'selected' : ''}>QA Inspector</option>
+            <option value="sales_executive" ${erpState.currentUser && erpState.currentUser.roleKey === 'sales_executive' ? 'selected' : ''}>Salesperson</option>
+            <option value="country_manager" ${erpState.currentUser && erpState.currentUser.roleKey === 'country_manager' ? 'selected' : ''}>Country Manager</option>
+            <option value="storekeeper" ${erpState.currentUser && erpState.currentUser.roleKey === 'storekeeper' ? 'selected' : ''}>Storekeeper</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `;
+
+  footer.innerHTML = `
+    <button class="quick-action-btn btn-outline" onclick="closeModal()">Cancel</button>
+    <button class="quick-action-btn btn-primary" onclick="confirmDeviceUserSwitch()">
+      <span>✓</span> Save
+    </button>
+  `;
+
+  openModal();
+}
+
+function confirmDeviceUserSwitch() {
+  const nameInput = document.getElementById('deviceUserName').value;
+  const roleKey = document.getElementById('deviceUserRole').value;
+
+  if (erpState.currentUser) {
+    erpState.currentUser.name = nameInput;
+    erpState.currentUser.roleKey = roleKey === 'admin' ? 'workshop_manager' : roleKey;
+  }
+  saveERPData(erpState);
+  closeModal();
+  updateUserHeader();
+  renderSidebarForActiveRole();
+  renderCurrentTab();
+  showToast(`Active device user set to: ${nameInput} (${roleKey})`, 'success');
+}
+
+window.openStageReportModal = openStageReportModal;
+window.openFullJobReportModal = openFullJobReportModal;
+window.signAndSubmitStage = signAndSubmitStage;
+window.addPhotoToStage = addPhotoToStage;
+window.removePhotoFromStage = removePhotoFromStage;
+window.openDeviceUserModal = openDeviceUserModal;
+window.confirmDeviceUserSwitch = confirmDeviceUserSwitch;
