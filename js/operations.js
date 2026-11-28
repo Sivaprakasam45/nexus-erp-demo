@@ -117,37 +117,47 @@ function getOperationsModuleHTML() {
     </div>
 
     <!-- Video Workflow Stage Tracker Strip (From WhatsApp Video Demonstration) -->
-    <div class="stage-strip-container">
-      <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 800; align-self: center; margin-right: 6px;">
-        STAGES:
-      </span>
-      ${[
-        { id: 'receiving', title: 'Receiving', icon: '📥' },
-        { id: 'dismantling', title: 'Dismantling', icon: '🔩' },
-        { id: 'cleaning', title: 'Cleaning', icon: '🧼' },
-        { id: 'initial_inspection', title: 'Inspection', icon: '🔍' },
-        { id: 'cost_estimations', title: 'Repair and quote', icon: '💰' },
-        { id: 'assembly_checklist', title: 'Repair', icon: '🔧' },
-        { id: 'test_report', title: 'Testing', icon: '⚡' },
-        { id: 'pre_dispatch', title: 'Pre-dispatch', icon: '📋' }
-      ].map(stg => `
-        <button class="stage-strip-pill ${(currentOpStep || 'receiving') === stg.id ? 'active' : ''}" onclick="switchOpStep('${stg.id}')">
-          <span>${stg.icon}</span> ${stg.title}
-        </button>
-      `).join('')}
+    <div class="stage-strip-wrapper">
+      <button type="button" class="stepper-scroll-btn" onclick="scrollStageStripLeft()" title="Scroll Left">‹</button>
+      <div class="stage-strip-container" id="stageStripContainer">
+        <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 800; align-self: center; margin-right: 6px; white-space: nowrap;">
+          STAGES:
+        </span>
+        ${[
+          { id: 'receiving', title: 'Receiving', icon: '📥' },
+          { id: 'dismantling', title: 'Dismantling', icon: '🔩' },
+          { id: 'cleaning', title: 'Cleaning', icon: '🧼' },
+          { id: 'initial_inspection', title: 'Inspection', icon: '🔍' },
+          { id: 'cost_estimations', title: 'Repair and quote', icon: '💰' },
+          { id: 'assembly_checklist', title: 'Repair', icon: '🔧' },
+          { id: 'test_report', title: 'Testing', icon: '⚡' },
+          { id: 'pre_dispatch', title: 'Pre-dispatch', icon: '📋' }
+        ].map(stg => `
+          <button class="stage-strip-pill ${(currentOpStep || 'receiving') === stg.id ? 'active' : ''}" onclick="switchOpStep('${stg.id}')">
+            <span>${stg.icon}</span> ${stg.title}
+          </button>
+        `).join('')}
+      </div>
+      <button type="button" class="stepper-scroll-btn" onclick="scrollStageStripRight()" title="Scroll Right">›</button>
     </div>
 
     <!-- 10-Step Operations Horizontal Stepper Bar (Matching Excel Sheet Tabs) -->
-    <div class="operations-stepper-bar">
-      ${opSteps.map(step => {
-        const isActive = (currentOpStep || 'receiving') === step.id;
-        return `
-          <button class="stepper-btn ${isActive ? 'active' : ''}" onclick="switchOpStep('${step.id}')">
-            <span class="step-num">${step.num}</span>
-            <span class="step-title">${step.title}</span>
-          </button>
-        `;
-      }).join('')}
+    <div class="stepper-scroll-wrapper">
+      <button type="button" class="stepper-scroll-btn" onclick="scrollStepperLeft()" title="Scroll Left">‹</button>
+      <div class="operations-stepper-container" id="opStepperContainer">
+        <div class="operations-stepper-bar" id="opStepperBar">
+          ${opSteps.map(step => {
+            const isActive = (currentOpStep || 'receiving') === step.id;
+            return `
+              <button class="stepper-btn ${isActive ? 'active' : ''}" onclick="switchOpStep('${step.id}')">
+                <span class="step-num">${step.num}</span>
+                <span class="step-title">${step.title}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+      <button type="button" class="stepper-scroll-btn" onclick="scrollStepperRight()" title="Scroll Right">›</button>
     </div>
 
     <!-- Active Step Work Area (Matching Excel Sheet Content) -->
@@ -189,18 +199,31 @@ function getOperationsModuleHTML() {
   `;
 }
 
-// Switch between the 10 Operations Steps
+// Switch between the 10 Operations Steps & Stages
 function switchOpStep(stepId) {
   currentOpStep = stepId;
   const workArea = document.getElementById('opStepWorkArea');
   const job = erpState.jobs.find(j => j.id === (selectedOpJobId || 'J000248')) || erpState.jobs[0];
   
-  // Update stepper buttons
+  // Update stepper buttons and auto-scroll into view
   document.querySelectorAll('.operations-stepper-bar .stepper-btn').forEach(btn => {
     btn.classList.remove('active');
   });
   const activeBtn = Array.from(document.querySelectorAll('.operations-stepper-bar .stepper-btn')).find(b => b.onclick && b.onclick.toString().includes(stepId));
-  if (activeBtn) activeBtn.classList.add('active');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    try { activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e){}
+  }
+
+  // Update stage strip pills and auto-scroll into view
+  document.querySelectorAll('.stage-strip-container .stage-strip-pill').forEach(pill => {
+    pill.classList.remove('active');
+  });
+  const activePill = Array.from(document.querySelectorAll('.stage-strip-container .stage-strip-pill')).find(p => p.onclick && p.onclick.toString().includes(stepId));
+  if (activePill) {
+    activePill.classList.add('active');
+    try { activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e){}
+  }
 
   if (workArea) {
     workArea.innerHTML = getOpStepContentHTML(stepId, job);
@@ -208,6 +231,46 @@ function switchOpStep(stepId) {
     renderCurrentTab();
   }
 }
+
+// Horizontal Scroll Helpers for Stepper & Stage Strips
+function scrollStepperLeft() {
+  const el = document.getElementById('opStepperContainer');
+  if (el) el.scrollBy({ left: -260, behavior: 'smooth' });
+}
+function scrollStepperRight() {
+  const el = document.getElementById('opStepperContainer');
+  if (el) el.scrollBy({ left: 260, behavior: 'smooth' });
+}
+function scrollStageStripLeft() {
+  const el = document.getElementById('stageStripContainer');
+  if (el) el.scrollBy({ left: -220, behavior: 'smooth' });
+}
+function scrollStageStripRight() {
+  const el = document.getElementById('stageStripContainer');
+  if (el) el.scrollBy({ left: 220, behavior: 'smooth' });
+}
+
+window.scrollStepperLeft = scrollStepperLeft;
+window.scrollStepperRight = scrollStepperRight;
+window.scrollStageStripLeft = scrollStageStripLeft;
+window.scrollStageStripRight = scrollStageStripRight;
+
+// Auto-attach wheel horizontal scroll on render
+function attachHorizontalWheelListeners() {
+  ['opStepperContainer', 'stageStripContainer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.wheelBound) {
+      el.dataset.wheelBound = 'true';
+      el.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
+  });
+}
+setTimeout(attachHorizontalWheelListeners, 300);
 
 // Select Active Job in Operations View
 function selectOpJob(jobId) {
