@@ -1500,12 +1500,16 @@ function toggleTodoPanel() {
   const backdrop = document.getElementById('todoBackdrop');
   if (!drawer) return;
 
-  const isOpen = drawer.classList.contains('open');
+  const isOpen = drawer.classList.contains('active') || drawer.classList.contains('open');
   if (isOpen) {
     closeTodoPanel();
   } else {
+    drawer.classList.add('active');
     drawer.classList.add('open');
-    if (backdrop) backdrop.classList.add('open');
+    if (backdrop) {
+      backdrop.classList.add('active');
+      backdrop.classList.add('open');
+    }
     renderTodoList();
   }
 }
@@ -1513,9 +1517,19 @@ function toggleTodoPanel() {
 function closeTodoPanel() {
   const drawer = document.getElementById('todoDrawer');
   const backdrop = document.getElementById('todoBackdrop');
-  if (drawer) drawer.classList.remove('open');
-  if (backdrop) backdrop.classList.remove('open');
+  if (drawer) {
+    drawer.classList.remove('active');
+    drawer.classList.remove('open');
+  }
+  if (backdrop) {
+    backdrop.classList.remove('active');
+    backdrop.classList.remove('open');
+  }
 }
+
+// Ensure globally accessible on window
+window.toggleTodoPanel = toggleTodoPanel;
+window.closeTodoPanel = closeTodoPanel;
 
 function renderTodoList() {
   const container = document.getElementById('todoListContainer');

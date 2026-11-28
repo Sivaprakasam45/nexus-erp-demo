@@ -1323,6 +1323,16 @@ function setupEventListeners() {
       if (e.target === modal) closeModal();
     });
   }
+
+  const todoBtn = document.getElementById('topbarTodoBtn');
+  if (todoBtn) {
+    todoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof toggleTodoPanel === 'function') {
+        toggleTodoPanel();
+      }
+    });
+  }
 }
 
 function setupGlobalShortcuts() {
