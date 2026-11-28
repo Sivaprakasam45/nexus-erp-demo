@@ -2135,8 +2135,8 @@ function openNewJobCardModal() {
     <form id="newJobCardForm" onsubmit="saveNewJobCard(event)" style="font-size: 13px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
         <div>
-          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Customer Name:</label>
-          <select id="newJobCustomer" class="erp-select" style="width: 100%; margin-top: 4px;" required>
+          <label style="display: block; font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">Customer Name:</label>
+          <select id="newJobCustomer" class="erp-select" style="width: 100%;" required>
             <option value="ABC Mining Corp">ABC Mining Corp</option>
             <option value="Petro Energy LLC">Petro Energy LLC</option>
             <option value="Gulf Power Station">Gulf Power Station</option>
@@ -2145,29 +2145,31 @@ function openNewJobCardModal() {
         </div>
 
         <div>
-          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Equipment Type & Description:</label>
-          <input type="text" id="newJobEquip" class="erp-input" value="Hydraulic Cylinder Overhaul" style="width: 100%; margin-top: 4px;" required />
+          <label style="display: block; font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">Equipment Type & Description:</label>
+          <input type="text" id="newJobEquip" class="erp-input" value="Hydraulic Cylinder Overhaul" style="width: 100%;" required />
         </div>
       </div>
 
       <!-- Mechanical Dimensions from Video (Bore, Rod, Stroke, Pressure) -->
-      <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 12px; margin-bottom: 14px;">
-        <span style="font-size: 11px; color: #38bdf8; text-transform: uppercase; font-weight: 700;">Mechanical Specifications (Video Parameters):</span>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 8px;">
+      <div style="background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <span style="font-size: 11px; color: #38bdf8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">⚙️ Mechanical Specifications (Video Parameters):</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
           <div>
-            <label style="font-size: 10px; color: #94a3b8;">Bore (mm):</label>
+            <label style="display: block; font-size: 10px; color: #94a3b8; font-weight: 600; margin-bottom: 4px;">Bore (mm):</label>
             <input type="text" id="newJobBore" class="erp-input" value="180 mm" style="width: 100%;" required />
           </div>
           <div>
-            <label style="font-size: 10px; color: #94a3b8;">Rod (mm):</label>
+            <label style="display: block; font-size: 10px; color: #94a3b8; font-weight: 600; margin-bottom: 4px;">Rod (mm):</label>
             <input type="text" id="newJobRod" class="erp-input" value="80 mm" style="width: 100%;" required />
           </div>
           <div>
-            <label style="font-size: 10px; color: #94a3b8;">Stroke (mm):</label>
+            <label style="display: block; font-size: 10px; color: #94a3b8; font-weight: 600; margin-bottom: 4px;">Stroke (mm):</label>
             <input type="text" id="newJobStroke" class="erp-input" value="1,200 mm" style="width: 100%;" required />
           </div>
           <div>
-            <label style="font-size: 10px; color: #94a3b8;">Test Bar:</label>
+            <label style="display: block; font-size: 10px; color: #94a3b8; font-weight: 600; margin-bottom: 4px;">Test Bar:</label>
             <input type="text" id="newJobPressure" class="erp-input" value="310 Bar" style="width: 100%;" required />
           </div>
         </div>
@@ -2176,13 +2178,13 @@ function openNewJobCardModal() {
       <!-- Problem & Seal Kit from Video -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
         <div>
-          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Problem Description:</label>
-          <input type="text" id="newJobProblem" class="erp-input" value="Received for repair & seal replacement" style="width: 100%; margin-top: 4px;" required />
+          <label style="display: block; font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">Problem Description:</label>
+          <input type="text" id="newJobProblem" class="erp-input" value="Received for repair & seal replacement" style="width: 100%;" required />
         </div>
 
         <div>
-          <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Seal Kit Requirement:</label>
-          <select id="newJobSealKit" class="erp-select" style="width: 100%; margin-top: 4px;">
+          <label style="display: block; font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">Seal Kit Requirement:</label>
+          <select id="newJobSealKit" class="erp-select" style="width: 100%;">
             <option value="Need new (Viton heavy-duty)">Need new (Viton heavy-duty)</option>
             <option value="Customer Supplied">Customer Supplied</option>
             <option value="Standard NBR Kit">Standard NBR Kit</option>
@@ -2192,24 +2194,27 @@ function openNewJobCardModal() {
 
       <!-- Labour Charge -->
       <div style="margin-bottom: 14px;">
-        <label style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Estimated Labour Charge ($):</label>
-        <input type="text" id="newJobLabour" class="erp-input" value="$1,530.00" style="width: 100%; margin-top: 4px;" />
+        <label style="display: block; font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">Estimated Labour Charge ($):</label>
+        <input type="text" id="newJobLabour" class="erp-input" value="$1,530.00" style="width: 100%;" />
       </div>
 
       <!-- Parts from Stock Picker (from Video) -->
-      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-bottom: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="font-size: 11px; color: #34d399; text-transform: uppercase; font-weight: 700;">Add Parts from Warehouse Stock:</span>
-          <button type="button" class="quick-action-btn btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="addPartRowToNewJob()">
+      <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 11px; color: #34d399; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">📦 Add Parts From Warehouse Stock:</span>
+          <button type="button" class="quick-action-btn btn-outline" style="padding: 4px 10px; font-size: 11px; border-color: rgba(16, 185, 129, 0.4); color: #34d399;" onclick="addPartRowToNewJob()">
             + Add Stock Item
           </button>
         </div>
         <div id="newJobPartsList">
           <div class="part-item-row" style="display: flex; gap: 8px; margin-bottom: 6px;">
             <select class="erp-select" style="flex: 1;">
-              ${(erpState.inventory || []).map(inv => `<option value="${inv.name}">${inv.code} - ${inv.name} (Stock: ${inv.stock} ${inv.uom})</option>`).join('')}
+              ${(erpState.inventory || []).map(inv => {
+                const qty = inv.stockQty !== undefined ? inv.stockQty : (inv.stock !== undefined ? inv.stock : 0);
+                return `<option value="${inv.name}">${inv.code} - ${inv.name} (Stock: ${qty} ${inv.uom})</option>`;
+              }).join('')}
             </select>
-            <input type="text" class="erp-input" placeholder="Qty" value="1 Set" style="width: 80px;" />
+            <input type="text" class="erp-input" placeholder="Qty" value="1 Set" style="width: 90px; text-align: center;" />
           </div>
         </div>
       </div>
@@ -2218,7 +2223,7 @@ function openNewJobCardModal() {
 
   footer.innerHTML = `
     <button class="quick-action-btn btn-outline" onclick="closeModal()">Cancel</button>
-    <button class="quick-action-btn btn-primary" onclick="document.getElementById('newJobCardForm').requestSubmit()">
+    <button class="quick-action-btn btn-primary" style="background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%); border: none; color: #fff; padding: 8px 18px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);" onclick="document.getElementById('newJobCardForm').requestSubmit()">
       <span>💾</span> Create Service Job Card
     </button>
   `;
@@ -2234,10 +2239,13 @@ function addPartRowToNewJob() {
   div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 6px;';
   div.innerHTML = `
     <select class="erp-select" style="flex: 1;">
-      ${(erpState.inventory || []).map(inv => `<option value="${inv.name}">${inv.code} - ${inv.name} (Stock: ${inv.stock} ${inv.uom})</option>`).join('')}
+      ${(erpState.inventory || []).map(inv => {
+        const qty = inv.stockQty !== undefined ? inv.stockQty : (inv.stock !== undefined ? inv.stock : 0);
+        return `<option value="${inv.name}">${inv.code} - ${inv.name} (Stock: ${qty} ${inv.uom})</option>`;
+      }).join('')}
     </select>
-    <input type="text" class="erp-input" placeholder="Qty" value="1 Pc" style="width: 80px;" />
-    <button type="button" class="btn-icon" onclick="this.parentElement.remove()" style="color: #ef4444;">✕</button>
+    <input type="text" class="erp-input" placeholder="Qty" value="1 Pc" style="width: 90px; text-align: center;" />
+    <button type="button" class="btn-icon" onclick="this.parentElement.remove()" style="color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px; padding: 4px 8px; background: rgba(239, 68, 68, 0.1);" title="Remove Item">✕</button>
   `;
   container.appendChild(div);
 }
